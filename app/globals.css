@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --noise: radial-gradient(circle at 20% 20%, rgba(255,255,255,.75), transparent 24rem), radial-gradient(circle at 88% 8%, rgba(234,209,162,.25), transparent 22rem), radial-gradient(circle at 80% 92%, rgba(109,47,63,.12), transparent 28rem);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #fffdf8;
+  color: #2d2320;
+  overflow-x: hidden;
+}
+button, a, input, textarea, select { font: inherit; }
+a { text-decoration: none; }
+::selection { background: #ead1a2; color: #3f2230; }
+
+.luxe-bg {
+  background:
+    var(--noise),
+    linear-gradient(135deg, #fffdf8 0%, #fbf4e9 34%, #f7e6dc 62%, #fff7ed 100%);
+}
+
+.deep-bg {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(234,209,162,.28), transparent 26rem),
+    radial-gradient(circle at 85% 88%, rgba(157,109,93,.24), transparent 28rem),
+    linear-gradient(135deg, #3f2230 0%, #612c3b 45%, #2d2320 100%);
+}
+
+.paper-card {
+  background-image:
+    linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,250,240,.78)),
+    url('/images/paper-texture.svg');
+}
+
+.gold-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(194,160,119,.96), transparent);
+}
+
+.ornament-corners::before,
+.ornament-corners::after {
+  content: '';
+  position: absolute;
+  width: 86px;
+  height: 86px;
+  border-color: rgba(194,160,119,.68);
+  pointer-events: none;
+}
+.ornament-corners::before {
+  left: 1.2rem;
+  top: 1.2rem;
+  border-left: 1px solid;
+  border-top: 1px solid;
+  border-top-left-radius: 2.4rem;
+}
+.ornament-corners::after {
+  right: 1.2rem;
+  bottom: 1.2rem;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  border-bottom-right-radius: 2.4rem;
+}
+
+.glass-nav {
+  background: rgba(255,253,248,.78);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.7);
+}
+
+.vertical-word {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.photo-mask {
+  clip-path: inset(0 round 2rem 2rem 7rem 2rem);
+}
+
+.album-book {
+  perspective: 1800px;
+}
+
+.album-page-left {
+  transform: rotateY(2deg);
+  transform-origin: right center;
+}
+
+.album-page-right {
+  transform: rotateY(-2deg);
+  transform-origin: left center;
+}
