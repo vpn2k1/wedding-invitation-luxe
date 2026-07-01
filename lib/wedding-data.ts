@@ -1,5 +1,7 @@
 import { weddingConfig } from './wedding-config';
 
+export { weddingConfig } from './wedding-config';
+
 export type WeddingEvent = {
   title: string;
   date: string;
