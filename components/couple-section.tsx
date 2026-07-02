@@ -1,9 +1,15 @@
+'use client';
+
 import Image from 'next/image';
 import { SectionHeading } from '@/components/section-heading';
-import { couple, weddingConfig } from '@/lib/wedding-data';
+import { useSiteSettings } from '@/components/site-settings-provider';
 
 export function CoupleSection() {
-  const people = [couple.bride, couple.groom];
+  const { settings } = useSiteSettings();
+  const people = [
+    { role: 'Cô dâu', name: settings.brideName, fullName: settings.brideName, description: settings.brideDescription, image: settings.brideImage },
+    { role: 'Chú rể', name: settings.groomName, fullName: settings.groomName, description: settings.groomDescription, image: settings.groomImage },
+  ];
 
   return (
     <section className="luxe-bg px-5 py-24">
@@ -26,7 +32,7 @@ export function CoupleSection() {
                   <h3 className="mt-4 font-display text-5xl leading-none text-plum">{person.name}</h3>
                   <div className="gold-line my-6" />
                   <p className="text-base leading-8 text-ink/66">{person.description}</p>
-                  <p className="mt-8 font-display text-3xl italic text-clay">{index === 0 ? weddingConfig.brideName : weddingConfig.groomName}</p>
+                  <p className="mt-8 font-display text-3xl italic text-clay">{person.fullName}</p>
                 </div>
               </div>
             </article>

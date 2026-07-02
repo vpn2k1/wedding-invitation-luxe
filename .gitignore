@@ -3,4 +3,5 @@ node_modules
 out
 dist
 .env*.local
+.env
 .DS_Store

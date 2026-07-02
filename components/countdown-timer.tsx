@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { weddingConfig } from '@/lib/wedding-data';
+import { useSiteSettings } from '@/components/site-settings-provider';
 
-function getTimeLeft() {
-  const target = new Date(weddingConfig.weddingDate).getTime();
+function getTimeLeft(targetDate: string) {
+  const target = new Date(targetDate).getTime();
   const now = Date.now();
   const diff = Math.max(target - now, 0);
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -15,12 +15,13 @@ function getTimeLeft() {
 }
 
 export function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft());
+  const { settings } = useSiteSettings();
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft(settings.weddingDate));
 
   useEffect(() => {
-    const timer = window.setInterval(() => setTimeLeft(getTimeLeft()), 1000);
+    const timer = window.setInterval(() => setTimeLeft(getTimeLeft(settings.weddingDate)), 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [settings.weddingDate]);
 
   const items = useMemo(
     () => [

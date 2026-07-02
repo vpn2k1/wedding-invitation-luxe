@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
-import { weddingConfig } from '@/lib/wedding-data';
+import { useSiteSettings } from '@/components/site-settings-provider';
 
 type MusicContextValue = {
   isPlaying: boolean;
@@ -12,11 +12,12 @@ type MusicContextValue = {
 const MusicContext = createContext<MusicContextValue | null>(null);
 
 export function MusicProvider({ children }: { children: ReactNode }) {
+  const { settings } = useSiteSettings();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    const audio = new Audio(weddingConfig.musicUrl);
+    const audio = new Audio(settings.musicUrl);
     audio.loop = true;
     audio.volume = 0.32;
     audioRef.current = audio;
@@ -32,7 +33,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('pause', onPause);
       audioRef.current = null;
     };
-  }, []);
+  }, [settings.musicUrl]);
 
   const startMusic = async () => {
     if (!audioRef.current) return;

@@ -4,12 +4,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMusic } from '@/components/music-provider';
-import { weddingConfig } from '@/lib/wedding-data';
+import { useSiteSettings } from '@/components/site-settings-provider';
 
 export function OpeningCard() {
   const router = useRouter();
   const { startMusic } = useMusic();
+  const { settings } = useSiteSettings();
   const [isOpening, setIsOpening] = useState(false);
+  const monogram = `${settings.brideName[0] || ''}&${settings.groomName[0] || ''}`;
 
   const handleOpen = async () => {
     setIsOpening(true);
@@ -29,15 +31,15 @@ export function OpeningCard() {
         <div className="order-2 text-center lg:order-1 lg:text-left">
           <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.52em] text-dune">Private Wedding Invitation</p>
           <h1 className="font-display text-6xl leading-[0.86] text-plum md:text-8xl lg:text-9xl">
-            {weddingConfig.brideName}
+            {settings.brideName}
             <span className="block text-4xl italic text-clay md:text-6xl">and</span>
-            {weddingConfig.groomName}
+            {settings.groomName}
           </h1>
           <div className="gold-line my-8 max-w-xl" />
-          <p className="mx-auto max-w-xl text-lg leading-9 text-ink/68 lg:mx-0">{weddingConfig.quote}</p>
+          <p className="mx-auto max-w-xl text-lg leading-9 text-ink/68 lg:mx-0">{settings.quote}</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
             <span className="rounded-full border border-dune/30 bg-white/55 px-5 py-3 text-sm font-bold uppercase tracking-[0.24em] text-plum shadow-soft">
-              {weddingConfig.shortDate}
+              {settings.displayDate}
             </span>
             <span className="text-sm font-semibold text-ink/50">Ấn mở thiệp để phát nhạc nền</span>
           </div>
@@ -52,16 +54,16 @@ export function OpeningCard() {
               }`}
             >
               <div className="relative aspect-[4/5] overflow-hidden rounded-[2.4rem] bg-cream">
-                <Image src={weddingConfig.coverImage} alt="Ảnh thiệp cưới mở đầu" fill priority className="object-cover" />
+                <Image src={settings.coverImage} alt="Ảnh thiệp cưới mở đầu" fill priority className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-plum/45 via-transparent to-white/10" />
                 <div className="absolute left-6 right-6 top-6 flex items-center justify-between text-white/85">
                   <span className="text-[10px] font-bold uppercase tracking-[0.36em]">Save the date</span>
-                  <span className="rounded-full border border-white/50 px-4 py-2 font-display text-lg">{weddingConfig.monogram}</span>
+                  <span className="rounded-full border border-white/50 px-4 py-2 font-display text-lg">{monogram}</span>
                 </div>
                 <div className="absolute inset-x-7 bottom-7 rounded-[2rem] border border-white/55 bg-porcelain/82 p-7 text-center shadow-card backdrop-blur">
                   <p className="text-[10px] font-bold uppercase tracking-[0.42em] text-dune">The Wedding of</p>
-                  <h2 className="mt-3 font-display text-5xl leading-none text-plum">{weddingConfig.fullTitle}</h2>
-                  <p className="mt-4 text-sm font-semibold uppercase tracking-[0.22em] text-ink/58">{weddingConfig.displayDate}</p>
+                  <h2 className="mt-3 font-display text-5xl leading-none text-plum">{settings.fullTitle}</h2>
+                  <p className="mt-4 text-sm font-semibold uppercase tracking-[0.22em] text-ink/58">{settings.displayDate}</p>
                 </div>
               </div>
             </div>

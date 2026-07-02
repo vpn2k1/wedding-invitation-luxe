@@ -1,7 +1,13 @@
+'use client';
+
 import { SectionHeading } from '@/components/section-heading';
-import { dressCodes, events } from '@/lib/wedding-data';
+import { useSiteSettings } from '@/components/site-settings-provider';
+import { dressCodes } from '@/lib/wedding-data';
 
 export function EventsSection() {
+  const { settings } = useSiteSettings();
+  const gridClassName = settings.layout.eventColumns === '2' ? 'lg:grid-cols-2' : 'lg:grid-cols-3';
+
   return (
     <section id="events" className="relative overflow-hidden bg-porcelain px-5 py-24">
       <div className="absolute -left-24 top-28 h-80 w-80 rounded-full bg-champagne/20 blur-3xl" />
@@ -14,12 +20,12 @@ export function EventsSection() {
           description="Thông tin các buổi lễ chính. Bạn có thể mở bản đồ để xem đường đi nhanh hơn."
         />
 
-        <div className="grid gap-5 lg:grid-cols-3">
-          {events.map((event, index) => (
+        <div className={`grid gap-5 ${gridClassName}`}>
+          {settings.events.map((event, index) => (
             <article key={event.title} className="group rounded-[2.4rem] border border-cream bg-white/76 p-6 shadow-soft transition hover:-translate-y-1 hover:shadow-card">
               <div className="flex items-start justify-between gap-5">
                 <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum font-display text-2xl text-white shadow-soft">0{index + 1}</span>
-                <span className="rounded-full border border-dune/25 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.26em] text-dune">{event.accent}</span>
+                <span className="rounded-full border border-dune/25 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.26em] text-dune">Event {index + 1}</span>
               </div>
               <h3 className="mt-7 font-display text-4xl leading-none text-plum">{event.title}</h3>
               <div className="gold-line my-5" />
