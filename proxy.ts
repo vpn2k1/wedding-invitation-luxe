@@ -25,7 +25,7 @@ export function proxy(request: NextRequest) {
       : NextResponse.redirect(new URL('/admin/login', request.url));
   }
 
-  const expectedSession = btoa(`${username}:${password}`);
+  const expectedSession = encodeURIComponent(`${username}:${password}`);
   const currentSession = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
 
   if (currentSession === expectedSession) {

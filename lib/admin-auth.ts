@@ -5,7 +5,7 @@ export function getAdminSessionToken(username = process.env.ADMIN_USERNAME, pass
     return null;
   }
 
-  return Buffer.from(`${username}:${password}`).toString('base64');
+  return encodeURIComponent(`${username}:${password}`);
 }
 
 export function isAdminAuthConfigured() {
