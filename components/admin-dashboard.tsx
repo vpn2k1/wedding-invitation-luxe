@@ -12,6 +12,13 @@ type UploadResponse = {
   image?: AlbumImage;
 };
 
+type AlbumReplaceResponse = {
+  success: boolean;
+  message?: string;
+  warning?: string;
+  image?: AlbumImage;
+};
+
 type MusicUploadResponse = {
   success: boolean;
   message?: string;
@@ -53,6 +60,7 @@ export function AdminDashboard() {
   const [isUploadingMusic, setIsUploadingMusic] = useState(false);
   const [uploadingImageField, setUploadingImageField] = useState<keyof Pick<WeddingSiteSettings, 'coverImage' | 'heroImage' | 'brideImage' | 'groomImage'> | null>(null);
   const [isUpdatingAlbum, setIsUpdatingAlbum] = useState(false);
+  const [replacingImageId, setReplacingImageId] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
 
@@ -269,6 +277,36 @@ export function AdminDashboard() {
       setError(deleteError instanceof Error ? deleteError.message : 'Không thể xóa ảnh.');
     } finally {
       setIsUpdatingAlbum(false);
+    }
+  };
+
+  const replaceAlbumImage = async (image: AlbumImage, replacementFile: File) => {
+    if (isUpdatingAlbum || replacingImageId) return;
+
+    setReplacingImageId(image.id);
+    setNotice('');
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', replacementFile);
+
+    try {
+      const response = await fetch(`/api/admin/album/${image.id}`, {
+        method: 'PATCH',
+        body: formData,
+      });
+      const data = (await response.json()) as AlbumReplaceResponse;
+
+      if (!response.ok || !data.success || !data.image) {
+        throw new Error(data.message || 'Không thể thay ảnh album.');
+      }
+
+      setImages((current) => current.map((item) => (item.id === image.id ? data.image as AlbumImage : item)));
+      setNotice(data.warning ? `Đã thay ảnh album. Cảnh báo Storage: ${data.warning}` : 'Đã thay ảnh album.');
+    } catch (replaceError) {
+      setError(replaceError instanceof Error ? replaceError.message : 'Không thể thay ảnh album.');
+    } finally {
+      setReplacingImageId(null);
     }
   };
 
@@ -615,9 +653,23 @@ export function AdminDashboard() {
 
                     {!isLoadingImages && images.map((image, index) => (
                       <article key={image.id} className="overflow-hidden rounded-2xl border border-champagne bg-ivory/70">
-                        <div className="relative aspect-square bg-champagne">
-                          <Image src={image.imageUrl} alt={image.title || 'Ảnh album cưới'} fill className="object-cover" />
-                        </div>
+                        <label className="group relative block aspect-square cursor-pointer bg-champagne">
+                          <Image src={image.imageUrl} alt={image.title || 'Ảnh album cưới'} fill className="object-cover transition group-hover:scale-105" />
+                          <span className="absolute inset-x-3 bottom-3 rounded-full bg-white/90 px-3 py-2 text-center text-xs font-bold uppercase tracking-[0.14em] text-wine shadow-card transition group-hover:bg-wine group-hover:text-white">
+                            {replacingImageId === image.id ? 'Đang thay...' : 'Đổi ảnh'}
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            disabled={Boolean(replacingImageId) || isUpdatingAlbum}
+                            onChange={(event) => {
+                              const selectedFile = event.target.files?.[0];
+                              event.target.value = '';
+                              if (selectedFile) replaceAlbumImage(image, selectedFile);
+                            }}
+                            className="hidden"
+                          />
+                        </label>
                         <div className="p-4">
                           <h3 className="line-clamp-1 font-semibold text-plum">{image.title || 'Chưa có tiêu đề'}</h3>
                           <p className="mt-1 line-clamp-2 text-sm leading-6 text-ink/60">{image.description || 'Chưa có mô tả.'}</p>
@@ -625,7 +677,7 @@ export function AdminDashboard() {
                             <button
                               type="button"
                               onClick={() => moveImage(index, -1)}
-                              disabled={index === 0 || isUpdatingAlbum}
+                              disabled={index === 0 || isUpdatingAlbum || Boolean(replacingImageId)}
                               className="rounded-full border border-wine/20 px-3 py-2 text-xs font-bold text-plum transition hover:bg-wine hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                             >
                               Lên
@@ -633,7 +685,7 @@ export function AdminDashboard() {
                             <button
                               type="button"
                               onClick={() => moveImage(index, 1)}
-                              disabled={index === images.length - 1 || isUpdatingAlbum}
+                              disabled={index === images.length - 1 || isUpdatingAlbum || Boolean(replacingImageId)}
                               className="rounded-full border border-wine/20 px-3 py-2 text-xs font-bold text-plum transition hover:bg-wine hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                             >
                               Xuống
@@ -641,7 +693,7 @@ export function AdminDashboard() {
                             <button
                               type="button"
                               onClick={() => deleteImage(image)}
-                              disabled={isUpdatingAlbum}
+                              disabled={isUpdatingAlbum || Boolean(replacingImageId)}
                               className="rounded-full bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40"
                             >
                               Xóa
