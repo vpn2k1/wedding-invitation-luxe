@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { mapAlbumImage } from '@/lib/supabase/mappers';
+import { getFallbackSiteSettings, mapAlbumImage } from '@/lib/supabase/mappers';
 import { createSupabaseAdminClient } from '@/lib/supabase/server';
 import type { AlbumImageRow } from '@/lib/supabase/types';
 
@@ -21,6 +21,51 @@ function getSafeFileName(fileName: string) {
     .replace(/[^a-z0-9._-]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
+}
+
+type SupabaseAdminClient = NonNullable<ReturnType<typeof createSupabaseAdminClient>>;
+
+async function ensureStorageBucket(supabase: SupabaseAdminClient) {
+  const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+
+  if (listError) {
+    return listError.message;
+  }
+
+  const exists = buckets?.some((bucket) => bucket.name === 'wedding-images');
+
+  if (exists) {
+    return null;
+  }
+
+  const { error } = await supabase.storage.createBucket('wedding-images', {
+    public: true,
+  });
+
+  if (error && !error.message.toLowerCase().includes('already exists')) {
+    return error.message;
+  }
+
+  return null;
+}
+
+async function ensureWeddingSite(supabase: SupabaseAdminClient, siteId: string) {
+  const fallback = getFallbackSiteSettings();
+  const { error } = await supabase
+    .from('wedding_sites')
+    .upsert(
+      {
+        id: siteId,
+        slug: fallback.slug,
+        bride_name: fallback.brideName,
+        groom_name: fallback.groomName,
+        wedding_date: fallback.weddingDate,
+        is_active: true,
+      },
+      { onConflict: 'id' }
+    );
+
+  return error?.message || null;
 }
 
 export async function POST(request: NextRequest) {
@@ -52,6 +97,18 @@ export async function POST(request: NextRequest) {
 
   if (file.size > MAX_FILE_SIZE) {
     return NextResponse.json({ success: false, message: 'File ảnh tối đa 5MB.' }, { status: 400 });
+  }
+
+  const bucketError = await ensureStorageBucket(supabase);
+
+  if (bucketError) {
+    return NextResponse.json({ success: false, message: `Không thể chuẩn bị bucket wedding-images: ${bucketError}` }, { status: 500 });
+  }
+
+  const siteError = await ensureWeddingSite(supabase, parsed.data.siteId);
+
+  if (siteError) {
+    return NextResponse.json({ success: false, message: `Không thể chuẩn bị wedding site: ${siteError}` }, { status: 500 });
   }
 
   const safeFileName = getSafeFileName(file.name) || 'album-image';
