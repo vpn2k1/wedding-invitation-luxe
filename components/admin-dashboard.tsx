@@ -18,6 +18,12 @@ type MusicUploadResponse = {
   musicUrl?: string;
 };
 
+type SiteImageUploadResponse = {
+  success: boolean;
+  message?: string;
+  imageUrl?: string;
+};
+
 type SettingsResponse = {
   success?: boolean;
   message?: string;
@@ -45,6 +51,7 @@ export function AdminDashboard() {
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingMusic, setIsUploadingMusic] = useState(false);
+  const [uploadingImageField, setUploadingImageField] = useState<keyof Pick<WeddingSiteSettings, 'coverImage' | 'heroImage' | 'brideImage' | 'groomImage'> | null>(null);
   const [isUpdatingAlbum, setIsUpdatingAlbum] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
@@ -169,6 +176,35 @@ export function AdminDashboard() {
       setError(uploadError instanceof Error ? uploadError.message : 'Không thể upload nhạc lúc này.');
     } finally {
       setIsUploadingMusic(false);
+    }
+  };
+
+  const uploadSiteImage = async (field: keyof Pick<WeddingSiteSettings, 'coverImage' | 'heroImage' | 'brideImage' | 'groomImage'>, fileToUpload: File) => {
+    setUploadingImageField(field);
+    setNotice('');
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', fileToUpload);
+    formData.append('field', field);
+
+    try {
+      const response = await fetch('/api/admin/site/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = (await response.json()) as SiteImageUploadResponse;
+
+      if (!response.ok || !data.success || !data.imageUrl) {
+        throw new Error(data.message || 'Không thể upload ảnh lúc này.');
+      }
+
+      setSettings((current) => ({ ...current, [field]: data.imageUrl as string }));
+      setNotice('Đã upload ảnh. Bấm "Lưu thay đổi" để lưu ảnh này vào cấu hình chung.');
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : 'Không thể upload ảnh lúc này.');
+    } finally {
+      setUploadingImageField(null);
     }
   };
 
@@ -377,10 +413,38 @@ export function AdminDashboard() {
                 <TextArea label="Quote" value={settings.quote} onChange={(value) => updateSetting('quote', value)} />
                 <TextArea label="Mô tả cô dâu" value={settings.brideDescription} onChange={(value) => updateSetting('brideDescription', value)} />
                 <TextArea label="Mô tả chú rể" value={settings.groomDescription} onChange={(value) => updateSetting('groomDescription', value)} />
-                <TextField label="Ảnh bìa" value={settings.coverImage} onChange={(value) => updateSetting('coverImage', value)} />
-                <TextField label="Ảnh hero" value={settings.heroImage} onChange={(value) => updateSetting('heroImage', value)} />
-                <TextField label="Ảnh cô dâu" value={settings.brideImage} onChange={(value) => updateSetting('brideImage', value)} />
-                <TextField label="Ảnh chú rể" value={settings.groomImage} onChange={(value) => updateSetting('groomImage', value)} />
+                <ImageSettingField
+                  label="Ảnh bìa"
+                  value={settings.coverImage}
+                  fallbackValue={getFallbackSiteSettings().coverImage}
+                  isUploading={uploadingImageField === 'coverImage'}
+                  onChange={(value) => updateSetting('coverImage', value)}
+                  onUpload={(fileToUpload) => uploadSiteImage('coverImage', fileToUpload)}
+                />
+                <ImageSettingField
+                  label="Ảnh hero"
+                  value={settings.heroImage}
+                  fallbackValue={getFallbackSiteSettings().heroImage}
+                  isUploading={uploadingImageField === 'heroImage'}
+                  onChange={(value) => updateSetting('heroImage', value)}
+                  onUpload={(fileToUpload) => uploadSiteImage('heroImage', fileToUpload)}
+                />
+                <ImageSettingField
+                  label="Ảnh cô dâu"
+                  value={settings.brideImage}
+                  fallbackValue={getFallbackSiteSettings().brideImage}
+                  isUploading={uploadingImageField === 'brideImage'}
+                  onChange={(value) => updateSetting('brideImage', value)}
+                  onUpload={(fileToUpload) => uploadSiteImage('brideImage', fileToUpload)}
+                />
+                <ImageSettingField
+                  label="Ảnh chú rể"
+                  value={settings.groomImage}
+                  fallbackValue={getFallbackSiteSettings().groomImage}
+                  isUploading={uploadingImageField === 'groomImage'}
+                  onChange={(value) => updateSetting('groomImage', value)}
+                  onUpload={(fileToUpload) => uploadSiteImage('groomImage', fileToUpload)}
+                />
               </div>
             )}
 
@@ -607,6 +671,61 @@ function TextField({ label, value, onChange }: { label: string; value: string; o
         className="w-full rounded-2xl border border-champagne bg-white px-4 py-3 outline-none transition focus:border-dune"
       />
     </label>
+  );
+}
+
+function ImageSettingField({
+  label,
+  value,
+  fallbackValue,
+  isUploading,
+  onChange,
+  onUpload,
+}: {
+  label: string;
+  value: string;
+  fallbackValue: string;
+  isUploading: boolean;
+  onChange: (value: string) => void;
+  onUpload: (file: File) => void;
+}) {
+  const previewValue = value || fallbackValue;
+
+  return (
+    <div className="rounded-2xl border border-champagne bg-ivory/70 p-4 md:col-span-2">
+      <div className="grid gap-4 sm:grid-cols-[180px_1fr]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-champagne">
+          <Image src={previewValue} alt={label} fill className="object-cover" />
+        </div>
+        <div className="min-w-0 space-y-3">
+          <TextField label={label} value={value} onChange={onChange} />
+          <div className="flex flex-wrap gap-2">
+            <label className="cursor-pointer rounded-full bg-wine px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#5e3030]">
+              {isUploading ? 'Đang upload...' : 'Upload ảnh'}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={isUploading}
+                onChange={(event) => {
+                  const selectedFile = event.target.files?.[0];
+                  event.target.value = '';
+                  if (selectedFile) onUpload(selectedFile);
+                }}
+                className="hidden"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => onChange('')}
+              className="rounded-full border border-wine/20 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-wine transition hover:bg-wine hover:text-white"
+            >
+              Dùng default
+            </button>
+          </div>
+          <p className="text-xs leading-5 text-ink/50">Để trống sẽ tự dùng ảnh mặc định của giao diện.</p>
+        </div>
+      </div>
+    </div>
   );
 }
 

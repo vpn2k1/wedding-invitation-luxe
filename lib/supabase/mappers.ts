@@ -106,6 +106,10 @@ export function mapSiteSettings(row: WeddingSiteSettingsRow): WeddingSiteSetting
     groomName: settings.groomName || row.wedding_sites?.groom_name || fallback.groomName,
     fullTitle: settings.fullTitle || `${settings.brideName || row.wedding_sites?.bride_name || fallback.brideName} & ${settings.groomName || row.wedding_sites?.groom_name || fallback.groomName}`,
     weddingDate: settings.weddingDate || row.wedding_sites?.wedding_date || fallback.weddingDate,
+    coverImage: settings.coverImage || fallback.coverImage,
+    heroImage: settings.heroImage || fallback.heroImage,
+    brideImage: settings.brideImage || fallback.brideImage,
+    groomImage: settings.groomImage || fallback.groomImage,
     qrItems: settings.qrItems?.length ? settings.qrItems : fallback.qrItems,
     events: settings.events?.length ? settings.events : fallback.events,
     layout: {
