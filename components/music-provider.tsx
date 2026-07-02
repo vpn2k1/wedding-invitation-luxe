@@ -17,7 +17,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (!settings.musicEnabled || !settings.musicUrl) {
+    if (!settings.musicUrl) {
       audioRef.current?.pause();
       audioRef.current = null;
       setIsPlaying(false);
@@ -40,7 +40,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('pause', onPause);
       audioRef.current = null;
     };
-  }, [settings.musicEnabled, settings.musicUrl]);
+  }, [settings.musicUrl]);
 
   const startMusic = async () => {
     if (!audioRef.current) return;

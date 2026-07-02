@@ -47,7 +47,6 @@ export type WeddingSiteSettings = {
   heroImage: string;
   brideImage: string;
   groomImage: string;
-  musicEnabled: boolean;
   musicUrl: string;
   brideDescription: string;
   groomDescription: string;

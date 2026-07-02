@@ -161,7 +161,7 @@ export function AdminDashboard() {
         throw new Error(data.message || 'Không thể upload nhạc lúc này.');
       }
 
-      setSettings((current) => ({ ...current, musicEnabled: true, musicUrl: data.musicUrl as string }));
+      setSettings((current) => ({ ...current, musicUrl: data.musicUrl as string }));
       setMusicFile(null);
       musicFormRef.current?.reset();
       setNotice('Đã upload nhạc nền. Bấm "Lưu thay đổi" để lưu URL này vào cấu hình chung.');
@@ -479,15 +479,6 @@ export function AdminDashboard() {
             {activePanel === 'music' && (
               <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
                 <form ref={musicFormRef} onSubmit={handleMusicUpload} className="space-y-4 rounded-2xl border border-champagne bg-ivory/70 p-4">
-                  <label className="flex items-center justify-between rounded-2xl border border-champagne bg-white px-4 py-3 font-semibold text-ink/70">
-                    Bật nhạc nền
-                    <input
-                      type="checkbox"
-                      checked={settings.musicEnabled}
-                      onChange={(event) => updateSetting('musicEnabled', event.target.checked)}
-                      className="h-5 w-5 accent-wine"
-                    />
-                  </label>
                   <TextField label="URL nhạc nền" value={settings.musicUrl} onChange={(value) => updateSetting('musicUrl', value)} />
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-ink/70" htmlFor="music-file">File nhạc</label>

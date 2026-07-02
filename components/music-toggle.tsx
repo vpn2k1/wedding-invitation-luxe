@@ -7,7 +7,7 @@ export function MusicToggle() {
   const { isPlaying, toggleMusic } = useMusic();
   const { settings } = useSiteSettings();
 
-  if (!settings.musicEnabled || !settings.musicUrl) {
+  if (!settings.musicUrl) {
     return null;
   }
 

@@ -31,7 +31,6 @@ export const siteSettingsSchema = z.object({
   heroImage: z.string().trim().min(1).max(500),
   brideImage: z.string().trim().min(1).max(500),
   groomImage: z.string().trim().min(1).max(500),
-  musicEnabled: z.boolean(),
   musicUrl: z.string().trim().max(500),
   brideDescription: z.string().trim().max(500),
   groomDescription: z.string().trim().max(500),
