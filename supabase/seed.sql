@@ -38,6 +38,7 @@ values (
     "heroImage": "/images/luxe-hero.svg",
     "brideImage": "/images/bride.svg",
     "groomImage": "/images/groom.svg",
+    "musicEnabled": true,
     "musicUrl": "/music/wedding-demo.wav",
     "brideDescription": "Yêu những buổi sáng có nắng, những bó hoa nhỏ và những điều bình yên được tạo nên từ sự chân thành.",
     "groomDescription": "Điềm tĩnh, ấm áp và luôn tin rằng nhà là nơi có người mình thương cùng trở về sau mỗi ngày dài.",

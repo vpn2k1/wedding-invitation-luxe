@@ -77,6 +77,7 @@ export function getFallbackSiteSettings(): WeddingSiteSettings {
     heroImage: weddingConfig.heroImage,
     brideImage: weddingConfig.brideImage,
     groomImage: weddingConfig.groomImage,
+    musicEnabled: true,
     musicUrl: weddingConfig.musicUrl,
     brideDescription: couple.bride.description,
     groomDescription: couple.groom.description,

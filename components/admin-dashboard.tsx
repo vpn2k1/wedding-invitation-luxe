@@ -12,6 +12,12 @@ type UploadResponse = {
   image?: AlbumImage;
 };
 
+type MusicUploadResponse = {
+  success: boolean;
+  message?: string;
+  musicUrl?: string;
+};
+
 type SettingsResponse = {
   success?: boolean;
   message?: string;
@@ -27,20 +33,24 @@ type MutationResponse = {
 export function AdminDashboard() {
   const router = useRouter();
   const uploadFormRef = useRef<HTMLFormElement | null>(null);
+  const musicFormRef = useRef<HTMLFormElement | null>(null);
   const [settings, setSettings] = useState<WeddingSiteSettings>(getFallbackSiteSettings());
-  const [activePanel, setActivePanel] = useState<'content' | 'events' | 'qr' | 'layout' | 'album'>('content');
+  const [activePanel, setActivePanel] = useState<'content' | 'events' | 'qr' | 'music' | 'layout' | 'album'>('content');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [musicFile, setMusicFile] = useState<File | null>(null);
   const [images, setImages] = useState<AlbumImage[]>([]);
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingMusic, setIsUploadingMusic] = useState(false);
   const [isUpdatingAlbum, setIsUpdatingAlbum] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
 
   const canUpload = useMemo(() => Boolean(file), [file]);
+  const canUploadMusic = useMemo(() => Boolean(musicFile), [musicFile]);
 
   const loadSettings = async () => {
     const response = await fetch('/api/admin/site/settings');
@@ -126,6 +136,39 @@ export function AdminDashboard() {
       setError(uploadError instanceof Error ? uploadError.message : 'Không thể upload ảnh lúc này.');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleMusicUpload = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!canUploadMusic || !musicFile) return;
+
+    setIsUploadingMusic(true);
+    setNotice('');
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', musicFile);
+
+    try {
+      const response = await fetch('/api/admin/music/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = (await response.json()) as MusicUploadResponse;
+
+      if (!response.ok || !data.success || !data.musicUrl) {
+        throw new Error(data.message || 'Không thể upload nhạc lúc này.');
+      }
+
+      setSettings((current) => ({ ...current, musicEnabled: true, musicUrl: data.musicUrl as string }));
+      setMusicFile(null);
+      musicFormRef.current?.reset();
+      setNotice('Đã upload nhạc nền. Bấm "Lưu thay đổi" để lưu URL này vào cấu hình chung.');
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : 'Không thể upload nhạc lúc này.');
+    } finally {
+      setIsUploadingMusic(false);
     }
   };
 
@@ -305,6 +348,7 @@ export function AdminDashboard() {
               ['content', 'Thông tin'],
               ['events', 'Địa chỉ & sự kiện'],
               ['qr', 'QR mừng cưới'],
+              ['music', 'Nhạc nền'],
               ['layout', 'Bố cục'],
               ['album', 'Album ảnh'],
             ].map(([value, label]) => (
@@ -337,7 +381,6 @@ export function AdminDashboard() {
                 <TextField label="Ảnh hero" value={settings.heroImage} onChange={(value) => updateSetting('heroImage', value)} />
                 <TextField label="Ảnh cô dâu" value={settings.brideImage} onChange={(value) => updateSetting('brideImage', value)} />
                 <TextField label="Ảnh chú rể" value={settings.groomImage} onChange={(value) => updateSetting('groomImage', value)} />
-                <TextField label="Nhạc nền" value={settings.musicUrl} onChange={(value) => updateSetting('musicUrl', value)} />
               </div>
             )}
 
@@ -430,6 +473,51 @@ export function AdminDashboard() {
                     Thêm QR
                   </button>
                 )}
+              </div>
+            )}
+
+            {activePanel === 'music' && (
+              <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+                <form ref={musicFormRef} onSubmit={handleMusicUpload} className="space-y-4 rounded-2xl border border-champagne bg-ivory/70 p-4">
+                  <label className="flex items-center justify-between rounded-2xl border border-champagne bg-white px-4 py-3 font-semibold text-ink/70">
+                    Bật nhạc nền
+                    <input
+                      type="checkbox"
+                      checked={settings.musicEnabled}
+                      onChange={(event) => updateSetting('musicEnabled', event.target.checked)}
+                      className="h-5 w-5 accent-wine"
+                    />
+                  </label>
+                  <TextField label="URL nhạc nền" value={settings.musicUrl} onChange={(value) => updateSetting('musicUrl', value)} />
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-ink/70" htmlFor="music-file">File nhạc</label>
+                    <input
+                      id="music-file"
+                      type="file"
+                      accept="audio/mpeg,audio/wav,audio/ogg,audio/mp4"
+                      onChange={(event) => setMusicFile(event.target.files?.[0] || null)}
+                      className="w-full rounded-2xl border border-dashed border-dune/60 bg-white px-4 py-3 text-sm outline-none file:mr-4 file:rounded-full file:border-0 file:bg-wine file:px-4 file:py-2 file:text-sm file:font-bold file:text-white"
+                    />
+                    <p className="mt-2 text-xs text-ink/50">Hỗ trợ MP3, WAV, OGG, M4A. Tối đa 15MB.</p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={!canUploadMusic || isUploadingMusic}
+                    className="w-full rounded-full bg-wine px-6 py-4 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#5e3030] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isUploadingMusic ? 'Đang upload...' : 'Upload nhạc'}
+                  </button>
+                </form>
+
+                <div className="rounded-2xl border border-champagne bg-ivory/70 p-4">
+                  <h2 className="font-serif text-3xl text-wine">Nhạc đang cấu hình</h2>
+                  <p className="mt-2 break-all text-sm leading-6 text-ink/60">{settings.musicUrl || 'Chưa có URL nhạc nền.'}</p>
+                  {settings.musicUrl && (
+                    <audio key={settings.musicUrl} controls className="mt-5 w-full">
+                      <source src={settings.musicUrl} />
+                    </audio>
+                  )}
+                </div>
               </div>
             )}
 

@@ -1,9 +1,15 @@
 'use client';
 
 import { useMusic } from '@/components/music-provider';
+import { useSiteSettings } from '@/components/site-settings-provider';
 
 export function MusicToggle() {
   const { isPlaying, toggleMusic } = useMusic();
+  const { settings } = useSiteSettings();
+
+  if (!settings.musicEnabled || !settings.musicUrl) {
+    return null;
+  }
 
   return (
     <button
