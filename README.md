@@ -2,7 +2,7 @@
 
 Project mẫu thiệp cưới online serverless bằng **Next.js + TypeScript + Tailwind CSS**.
 
-Bản này có giao diện luxe/editorial, admin quản lý nội dung và dùng Supabase chung với project thiệp cưới serverless. Mỗi website tách dữ liệu bằng `NEXT_PUBLIC_SITE_ID`.
+Bản này có giao diện luxe/editorial, admin quản lý nội dung và dùng chung một bộ dữ liệu Supabase với project thiệp cưới serverless qua cùng `NEXT_PUBLIC_SITE_ID`.
 
 ## Điểm mới so với bản trước
 
@@ -29,18 +29,18 @@ http://localhost:3000
 
 ## Supabase dùng chung
 
-Tạo `.env.local` từ `.env.example`. Có thể dùng cùng `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` với project `wedding-invitation-serverless`, nhưng đặt `NEXT_PUBLIC_SITE_ID` riêng cho project luxe:
+Tạo `.env.local` từ `.env.example`. Để đọc/chỉnh cùng dữ liệu với project `wedding-invitation-serverless`, dùng cùng `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` và cùng `NEXT_PUBLIC_SITE_ID`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_SITE_ID=22222222-2222-4222-8222-222222222222
+NEXT_PUBLIC_SITE_ID=11111111-1111-4111-8111-111111111111
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=doi-mat-khau-nay
 ```
 
-Chạy `supabase/schema.sql` một lần trên Supabase chung, sau đó chạy `supabase/seed.sql` của project này để tạo site luxe mẫu. Vào `/admin/login` bằng `ADMIN_USERNAME`/`ADMIN_PASSWORD`, rồi chỉnh nội dung tại `/admin`.
+Chạy `supabase/schema.sql` một lần trên Supabase chung, sau đó chạy một file seed cho dữ liệu mẫu. Nếu các project dùng chung `NEXT_PUBLIC_SITE_ID`, admin ở bất kỳ project nào cũng sửa cùng bảng `site_settings`, `album_images` và `guest_comments`.
 
 ## Cấu trúc chính
 

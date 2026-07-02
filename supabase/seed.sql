@@ -1,7 +1,7 @@
 insert into public.wedding_sites (id, slug, bride_name, groom_name, wedding_date, is_active)
 values (
-  '22222222-2222-4222-8222-222222222222',
-  'ha-nhi-phuong-nam-luxe',
+  '11111111-1111-4111-8111-111111111111',
+  'ha-nhi-phuong-nam',
   'Hà Nhi',
   'Phương Nam',
   '2026-12-20T18:00:00+07:00',
@@ -15,19 +15,19 @@ on conflict (slug) do update set
 
 insert into public.album_images (site_id, title, description, image_url, storage_path, sort_order, is_visible)
 values
-  ('22222222-2222-4222-8222-222222222222', 'Buổi sáng có nắng', 'Ánh sáng đầu ngày, một chiếc váy trắng và nụ cười rất khẽ.', '/images/album-1.svg', null, 1, true),
-  ('22222222-2222-4222-8222-222222222222', 'Bên hiên nhà', 'Khoảnh khắc bình yên như cách chúng mình muốn giữ nhau mỗi ngày.', '/images/album-2.svg', null, 2, true),
-  ('22222222-2222-4222-8222-222222222222', 'Lời hẹn', 'Một lời hẹn giản dị nhưng đủ ấm cho cả chặng đường phía trước.', '/images/album-3.svg', null, 3, true),
-  ('22222222-2222-4222-8222-222222222222', 'Dưới vòm hoa', 'Nơi mọi điều dịu dàng được lưu lại trong khung hình.', '/images/album-4.svg', null, 4, true),
-  ('22222222-2222-4222-8222-222222222222', 'Chiều vàng', 'Hoàng hôn rơi xuống, câu chuyện của chúng mình trở nên ấm hơn.', '/images/album-5.svg', null, 5, true),
-  ('22222222-2222-4222-8222-222222222222', 'Ngày vui', 'Cảm ơn vì đã cùng chúng mình đi đến khoảnh khắc này.', '/images/album-6.svg', null, 6, true);
+  ('11111111-1111-4111-8111-111111111111', 'Buổi sáng có nắng', 'Ánh sáng đầu ngày, một chiếc váy trắng và nụ cười rất khẽ.', '/images/album-1.svg', null, 1, true),
+  ('11111111-1111-4111-8111-111111111111', 'Bên hiên nhà', 'Khoảnh khắc bình yên như cách chúng mình muốn giữ nhau mỗi ngày.', '/images/album-2.svg', null, 2, true),
+  ('11111111-1111-4111-8111-111111111111', 'Lời hẹn', 'Một lời hẹn giản dị nhưng đủ ấm cho cả chặng đường phía trước.', '/images/album-3.svg', null, 3, true),
+  ('11111111-1111-4111-8111-111111111111', 'Dưới vòm hoa', 'Nơi mọi điều dịu dàng được lưu lại trong khung hình.', '/images/album-4.svg', null, 4, true),
+  ('11111111-1111-4111-8111-111111111111', 'Chiều vàng', 'Hoàng hôn rơi xuống, câu chuyện của chúng mình trở nên ấm hơn.', '/images/album-5.svg', null, 5, true),
+  ('11111111-1111-4111-8111-111111111111', 'Ngày vui', 'Cảm ơn vì đã cùng chúng mình đi đến khoảnh khắc này.', '/images/album-6.svg', null, 6, true);
 
 insert into public.site_settings (site_id, settings)
 values (
-  '22222222-2222-4222-8222-222222222222',
+  '11111111-1111-4111-8111-111111111111',
   '{
-    "siteId": "22222222-2222-4222-8222-222222222222",
-    "slug": "ha-nhi-phuong-nam-luxe",
+    "siteId": "11111111-1111-4111-8111-111111111111",
+    "slug": "ha-nhi-phuong-nam",
     "brideName": "Hà Nhi",
     "groomName": "Phương Nam",
     "fullTitle": "Hà Nhi & Phương Nam",
@@ -53,8 +53,8 @@ on conflict (site_id) do update set settings = excluded.settings;
 
 insert into public.guest_comments (site_id, name, message, attendance_status, guest_count, is_visible, created_at)
 values
-  ('22222222-2222-4222-8222-222222222222', 'Gia đình cô Lan', 'Chúc hai con trăm năm hạnh phúc, luôn yêu thương và đồng hành cùng nhau.', 'attending', 2, true, now() - interval '2 hours'),
-  ('22222222-2222-4222-8222-222222222222', 'Tuấn Anh', 'Chúc mừng Nam và Nhi! Hẹn gặp hai bạn trong ngày vui nhé.', 'attending', 1, true, now() - interval '5 hours'),
-  ('22222222-2222-4222-8222-222222222222', 'Nhóm bạn đại học', 'Mong hai bạn luôn giữ được nụ cười như hôm nay. Happy wedding!', 'maybe', 4, true, now() - interval '1 day'),
-  ('22222222-2222-4222-8222-222222222222', 'Minh Thư', 'Thiệp rất xinh, chúc hai bạn có một đám cưới thật trọn vẹn và một đời bình an bên nhau.', 'attending', 1, true, now() - interval '2 days'),
-  ('22222222-2222-4222-8222-222222222222', 'Anh Đức', 'Thật vui khi được chứng kiến ngày đặc biệt này. Chúc mừng hai bạn!', 'not_attending', 1, true, now() - interval '3 days');
+  ('11111111-1111-4111-8111-111111111111', 'Gia đình cô Lan', 'Chúc hai con trăm năm hạnh phúc, luôn yêu thương và đồng hành cùng nhau.', 'attending', 2, true, now() - interval '2 hours'),
+  ('11111111-1111-4111-8111-111111111111', 'Tuấn Anh', 'Chúc mừng Nam và Nhi! Hẹn gặp hai bạn trong ngày vui nhé.', 'attending', 1, true, now() - interval '5 hours'),
+  ('11111111-1111-4111-8111-111111111111', 'Nhóm bạn đại học', 'Mong hai bạn luôn giữ được nụ cười như hôm nay. Happy wedding!', 'maybe', 4, true, now() - interval '1 day'),
+  ('11111111-1111-4111-8111-111111111111', 'Minh Thư', 'Thiệp rất xinh, chúc hai bạn có một đám cưới thật trọn vẹn và một đời bình an bên nhau.', 'attending', 1, true, now() - interval '2 days'),
+  ('11111111-1111-4111-8111-111111111111', 'Anh Đức', 'Thật vui khi được chứng kiến ngày đặc biệt này. Chúc mừng hai bạn!', 'not_attending', 1, true, now() - interval '3 days');
