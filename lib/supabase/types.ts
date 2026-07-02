@@ -26,6 +26,14 @@ export type GuestComment = {
   createdAt: string;
 };
 
+export type BankQrItem = {
+  ownerName: string;
+  bankName: string;
+  accountNumber: string;
+  qrImage: string;
+  note: string;
+};
+
 export type WeddingSiteSettings = {
   siteId: string;
   slug: string;
@@ -42,6 +50,7 @@ export type WeddingSiteSettings = {
   musicUrl: string;
   brideDescription: string;
   groomDescription: string;
+  qrItems: BankQrItem[];
   events: {
     title: string;
     date: string;

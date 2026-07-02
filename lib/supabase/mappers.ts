@@ -1,4 +1,4 @@
-import { albumImages, events, initialComments, weddingConfig, couple } from '@/lib/wedding-data';
+import { albumImages, bankQrList, events, initialComments, weddingConfig, couple } from '@/lib/wedding-data';
 import type { AlbumImage, AlbumImageRow, GuestComment, GuestCommentRow, WeddingSiteSettings, WeddingSiteSettingsRow } from '@/lib/supabase/types';
 
 const fallbackSiteId = process.env.NEXT_PUBLIC_SITE_ID || 'static-site';
@@ -80,6 +80,7 @@ export function getFallbackSiteSettings(): WeddingSiteSettings {
     musicUrl: weddingConfig.musicUrl,
     brideDescription: couple.bride.description,
     groomDescription: couple.groom.description,
+    qrItems: bankQrList,
     events,
     layout: {
       eventColumns: '3',
@@ -105,6 +106,7 @@ export function mapSiteSettings(row: WeddingSiteSettingsRow): WeddingSiteSetting
     groomName: settings.groomName || row.wedding_sites?.groom_name || fallback.groomName,
     fullTitle: settings.fullTitle || `${settings.brideName || row.wedding_sites?.bride_name || fallback.brideName} & ${settings.groomName || row.wedding_sites?.groom_name || fallback.groomName}`,
     weddingDate: settings.weddingDate || row.wedding_sites?.wedding_date || fallback.weddingDate,
+    qrItems: settings.qrItems?.length ? settings.qrItems : fallback.qrItems,
     events: settings.events?.length ? settings.events : fallback.events,
     layout: {
       ...fallback.layout,

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { getFallbackSiteSettings } from '@/lib/supabase/mappers';
-import type { AlbumImage, WeddingSiteSettings } from '@/lib/supabase/types';
+import type { AlbumImage, BankQrItem, WeddingSiteSettings } from '@/lib/supabase/types';
 
 type UploadResponse = {
   success: boolean;
@@ -28,7 +28,7 @@ export function AdminDashboard() {
   const router = useRouter();
   const uploadFormRef = useRef<HTMLFormElement | null>(null);
   const [settings, setSettings] = useState<WeddingSiteSettings>(getFallbackSiteSettings());
-  const [activePanel, setActivePanel] = useState<'content' | 'events' | 'layout' | 'album'>('content');
+  const [activePanel, setActivePanel] = useState<'content' | 'events' | 'qr' | 'layout' | 'album'>('content');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -229,6 +229,36 @@ export function AdminDashboard() {
     }));
   };
 
+  const updateQrItem = (index: number, key: keyof BankQrItem, value: string) => {
+    setSettings((current) => ({
+      ...current,
+      qrItems: current.qrItems.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item)),
+    }));
+  };
+
+  const addQrItem = () => {
+    setSettings((current) => ({
+      ...current,
+      qrItems: [
+        ...current.qrItems,
+        {
+          ownerName: 'Người nhận',
+          bankName: '',
+          accountNumber: '',
+          qrImage: '/images/qr-bride.svg',
+          note: '',
+        },
+      ],
+    }));
+  };
+
+  const removeQrItem = (index: number) => {
+    setSettings((current) => ({
+      ...current,
+      qrItems: current.qrItems.filter((_, itemIndex) => itemIndex !== index),
+    }));
+  };
+
   const handleLogout = async () => {
     await fetch('/api/auth/admin/logout', { method: 'POST' });
     router.replace('/admin/login');
@@ -269,11 +299,12 @@ export function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid gap-6 lg:grid-cols-[250px_1fr]">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-[250px_1fr]">
           <aside className="rounded-[1.5rem] border border-white/80 bg-white/75 p-4 shadow-card backdrop-blur">
             {[
               ['content', 'Thông tin'],
               ['events', 'Địa chỉ & sự kiện'],
+              ['qr', 'QR mừng cưới'],
               ['layout', 'Bố cục'],
               ['album', 'Album ảnh'],
             ].map(([value, label]) => (
@@ -290,7 +321,7 @@ export function AdminDashboard() {
             ))}
           </aside>
 
-          <section className="rounded-[1.5rem] border border-white/80 bg-white/75 p-5 shadow-card backdrop-blur">
+          <section className="min-w-0 rounded-[1.5rem] border border-white/80 bg-white/75 p-4 shadow-card backdrop-blur sm:p-5">
             {activePanel === 'content' && (
               <div className="grid gap-4 md:grid-cols-2">
                 <TextField label="Tên cô dâu" value={settings.brideName} onChange={(value) => updateSetting('brideName', value)} />
@@ -373,6 +404,35 @@ export function AdminDashboard() {
               </div>
             )}
 
+            {activePanel === 'qr' && (
+              <div className="space-y-5">
+                {settings.qrItems.map((item, index) => (
+                  <div key={`${item.ownerName}-${index}`} className="rounded-2xl border border-champagne bg-ivory/70 p-4">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                      <h2 className="font-serif text-2xl text-plum">QR {index + 1}</h2>
+                      {settings.qrItems.length > 1 && (
+                        <button type="button" onClick={() => removeQrItem(index)} className="rounded-full border border-wine/20 px-4 py-2 text-sm font-bold text-plum">
+                          Xóa
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <TextField label="Tên người nhận" value={item.ownerName} onChange={(value) => updateQrItem(index, 'ownerName', value)} />
+                      <TextField label="Tên ngân hàng" value={item.bankName} onChange={(value) => updateQrItem(index, 'bankName', value)} />
+                      <TextField label="Số tài khoản" value={item.accountNumber} onChange={(value) => updateQrItem(index, 'accountNumber', value)} />
+                      <TextField label="Đường dẫn ảnh QR" value={item.qrImage} onChange={(value) => updateQrItem(index, 'qrImage', value)} />
+                      <TextArea label="Nội dung/ghi chú" value={item.note} onChange={(value) => updateQrItem(index, 'note', value)} />
+                    </div>
+                  </div>
+                ))}
+                {settings.qrItems.length < 6 && (
+                  <button type="button" onClick={addQrItem} className="rounded-full bg-wine px-5 py-3 text-sm font-bold text-white">
+                    Thêm QR
+                  </button>
+                )}
+              </div>
+            )}
+
             {activePanel === 'album' && (
               <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
                 <form ref={uploadFormRef} onSubmit={handleUpload} className="space-y-4 rounded-2xl border border-champagne bg-ivory/70 p-4">
@@ -405,7 +465,7 @@ export function AdminDashboard() {
                       Tải lại
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                     {isLoadingImages && Array.from({ length: 6 }).map((_, index) => (
                       <div key={index} className="aspect-square animate-pulse rounded-2xl bg-champagne/70" />
                     ))}

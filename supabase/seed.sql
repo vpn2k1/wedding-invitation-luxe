@@ -41,6 +41,10 @@ values (
     "musicUrl": "/music/wedding-demo.wav",
     "brideDescription": "Yêu những buổi sáng có nắng, những bó hoa nhỏ và những điều bình yên được tạo nên từ sự chân thành.",
     "groomDescription": "Điềm tĩnh, ấm áp và luôn tin rằng nhà là nơi có người mình thương cùng trở về sau mỗi ngày dài.",
+    "qrItems": [
+      { "ownerName": "Cô dâu", "bankName": "Vietcombank", "accountNumber": "0123456789", "qrImage": "/images/qr-bride.svg", "note": "Cảm ơn bạn đã đến chung vui cùng chúng mình. Món quà của bạn sẽ là kỷ niệm đẹp cho ngày trọng đại này." },
+      { "ownerName": "Chú rể", "bankName": "Techcombank", "accountNumber": "9876543210", "qrImage": "/images/qr-groom.svg", "note": "Cảm ơn bạn đã đến chung vui cùng chúng mình. Món quà của bạn sẽ là kỷ niệm đẹp cho ngày trọng đại này." }
+    ],
     "events": [
       { "title": "Lễ Gia Tiên", "date": "20.12.2026", "time": "09:00", "locationName": "Tư gia nhà gái", "address": "Đầm Rái, Nhuận Trạch, Lương Sơn, Phú Thọ", "mapUrl": "https://maps.app.goo.gl/2hV7cEBN56ctUtJu5", "description": "Nghi lễ thân mật cùng gia đình hai bên, bắt đầu cho ngày vui trọn vẹn." },
       { "title": "Tiệc Cưới", "date": "20.12.2026", "time": "18:00", "locationName": "Tư gia nhà trai", "address": "Đội 6 Phú Trạch, Mễ Sở, Hưng Yên", "mapUrl": "https://maps.app.goo.gl/dLyZFtnbFTgYFmPe7", "description": "Một buổi tối có ánh nến, âm nhạc và sự hiện diện quý giá của những người thân yêu." },

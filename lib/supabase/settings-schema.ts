@@ -10,6 +10,14 @@ export const weddingEventSchema = z.object({
   description: z.string().trim().max(500),
 });
 
+export const bankQrItemSchema = z.object({
+  ownerName: z.string().trim().min(1).max(120),
+  bankName: z.string().trim().min(1).max(120),
+  accountNumber: z.string().trim().min(1).max(80),
+  qrImage: z.string().trim().min(1).max(500),
+  note: z.string().trim().max(500),
+});
+
 export const siteSettingsSchema = z.object({
   siteId: z.string().uuid(),
   slug: z.string().trim().min(1).max(120),
@@ -26,6 +34,7 @@ export const siteSettingsSchema = z.object({
   musicUrl: z.string().trim().min(1).max(500),
   brideDescription: z.string().trim().max(500),
   groomDescription: z.string().trim().max(500),
+  qrItems: z.array(bankQrItemSchema).min(1).max(6),
   events: z.array(weddingEventSchema).min(1).max(6),
   layout: z.object({
     eventColumns: z.enum(['2', '3']),

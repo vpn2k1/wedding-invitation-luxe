@@ -66,16 +66,16 @@ export function AlbumStorybook() {
         </div>
 
         <section className="album-book grid gap-7 lg:grid-cols-[1fr_320px]">
-          <div className="grid gap-5 rounded-[2.8rem] border border-white/70 bg-white/50 p-3 shadow-glow backdrop-blur md:grid-cols-2 md:p-5">
+          <div className="grid min-w-0 gap-5 rounded-[2.8rem] border border-white/70 bg-white/50 p-3 shadow-glow backdrop-blur md:grid-cols-2 md:p-5">
             <article className="album-page-left relative overflow-hidden rounded-[2.2rem] bg-cream shadow-soft">
               <div className="relative aspect-[4/5] md:aspect-[4/5]">
                 {isLoading && <div className="absolute inset-0 animate-pulse bg-cream" />}
                 {!isLoading && activeImage && <Image src={activeImage.imageUrl} alt={activeImage.title || 'Ảnh album cưới'} fill priority className="object-cover" />}
                 <div className="absolute inset-0 bg-gradient-to-t from-plum/55 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white">
+                <div className="absolute bottom-4 left-4 right-4 text-white sm:bottom-6 sm:left-6 sm:right-6">
                   <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-champagne">Page {pageLabel}</p>
-                  <h2 className="mt-2 font-display text-5xl leading-none">{activeImage?.title || 'Khoảnh khắc cưới'}</h2>
-                  <p className="mt-3 leading-7 text-white/78">{activeImage?.description || 'Một khoảnh khắc đáng nhớ trong album.'}</p>
+                  <h2 className="mt-2 line-clamp-2 font-display text-4xl leading-none sm:text-5xl">{activeImage?.title || 'Khoảnh khắc cưới'}</h2>
+                  <p className="mt-3 line-clamp-3 leading-7 text-white/78">{activeImage?.description || 'Một khoảnh khắc đáng nhớ trong album.'}</p>
                 </div>
               </div>
             </article>
