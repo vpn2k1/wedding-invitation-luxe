@@ -15,6 +15,17 @@ const metadataSchema = z.object({
   description: z.string().trim().max(500).optional(),
 });
 
+function logUpload(requestId: string, step: string, details?: Record<string, unknown>) {
+  console.info(`[admin-album-upload:${requestId}] ${step}`, details || {});
+}
+
+function logUploadError(requestId: string, step: string, error: unknown, details?: Record<string, unknown>) {
+  console.error(`[admin-album-upload:${requestId}] ${step}`, {
+    ...details,
+    error,
+  });
+}
+
 function getSafeFileName(fileName: string) {
   return fileName
     .toLowerCase()
@@ -69,77 +80,120 @@ async function ensureWeddingSite(supabase: SupabaseAdminClient, siteId: string) 
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = createSupabaseAdminClient();
+  const requestId = crypto.randomUUID();
+  logUpload(requestId, 'request:start');
 
-  if (!supabase) {
-    return NextResponse.json({ success: false, message: 'Supabase admin client chưa được cấu hình.' }, { status: 503 });
+  try {
+    const supabase = createSupabaseAdminClient();
+
+    if (!supabase) {
+      logUploadError(requestId, 'config:missing-admin-client', 'Supabase admin client is null', {
+        hasUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+        hasServiceRoleKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+      });
+      return NextResponse.json({ success: false, message: 'Supabase admin client chưa được cấu hình.' }, { status: 503 });
+    }
+
+    const formData = await request.formData();
+    const file = formData.get('file');
+    const parsed = metadataSchema.safeParse({
+      siteId: formData.get('siteId') || process.env.NEXT_PUBLIC_SITE_ID,
+      title: formData.get('title') || undefined,
+      description: formData.get('description') || undefined,
+    });
+
+    if (!parsed.success) {
+      logUploadError(requestId, 'metadata:invalid', parsed.error.flatten(), {
+        envSiteId: process.env.NEXT_PUBLIC_SITE_ID,
+      });
+      return NextResponse.json({ success: false, message: parsed.error.issues[0]?.message || 'Metadata không hợp lệ.' }, { status: 400 });
+    }
+
+    if (!(file instanceof File)) {
+      logUploadError(requestId, 'file:missing', 'file field is missing');
+      return NextResponse.json({ success: false, message: 'Thiếu file ảnh.' }, { status: 400 });
+    }
+
+    logUpload(requestId, 'file:received', {
+      siteId: parsed.data.siteId,
+      fileName: file.name,
+      fileType: file.type,
+      fileSize: file.size,
+      title: parsed.data.title,
+    });
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      logUploadError(requestId, 'file:unsupported-type', file.type, { allowedTypes: ALLOWED_TYPES });
+      return NextResponse.json({ success: false, message: 'Chỉ hỗ trợ JPEG, PNG hoặc WebP.' }, { status: 400 });
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      logUploadError(requestId, 'file:too-large', file.size, { maxFileSize: MAX_FILE_SIZE });
+      return NextResponse.json({ success: false, message: 'File ảnh tối đa 5MB.' }, { status: 400 });
+    }
+
+    logUpload(requestId, 'bucket:ensure:start');
+    const bucketError = await ensureStorageBucket(supabase);
+
+    if (bucketError) {
+      logUploadError(requestId, 'bucket:ensure:failed', bucketError);
+      return NextResponse.json({ success: false, message: `Không thể chuẩn bị bucket wedding-images: ${bucketError}` }, { status: 500 });
+    }
+
+    logUpload(requestId, 'site:ensure:start', { siteId: parsed.data.siteId });
+    const siteError = await ensureWeddingSite(supabase, parsed.data.siteId);
+
+    if (siteError) {
+      logUploadError(requestId, 'site:ensure:failed', siteError, { siteId: parsed.data.siteId });
+      return NextResponse.json({ success: false, message: `Không thể chuẩn bị wedding site: ${siteError}` }, { status: 500 });
+    }
+
+    const safeFileName = getSafeFileName(file.name) || 'album-image';
+    const storagePath = `${parsed.data.siteId}/album/${Date.now()}-${safeFileName}`;
+    logUpload(requestId, 'storage:upload:start', { storagePath });
+    const { error: uploadError } = await supabase.storage.from('wedding-images').upload(storagePath, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+    if (uploadError) {
+      logUploadError(requestId, 'storage:upload:failed', uploadError, { storagePath });
+      return NextResponse.json({ success: false, message: uploadError.message }, { status: 500 });
+    }
+
+    const { data: publicUrlData } = supabase.storage.from('wedding-images').getPublicUrl(storagePath);
+    logUpload(requestId, 'database:insert:start', {
+      siteId: parsed.data.siteId,
+      storagePath,
+      publicUrl: publicUrlData.publicUrl,
+    });
+    const { data, error } = await supabase
+      .from('album_images')
+      .insert({
+        site_id: parsed.data.siteId,
+        title: parsed.data.title || null,
+        description: parsed.data.description || null,
+        image_url: publicUrlData.publicUrl,
+        storage_path: storagePath,
+        is_visible: true,
+      })
+      .select('*')
+      .single();
+
+    if (error || !data) {
+      logUploadError(requestId, 'database:insert:failed', error || 'missing inserted row', { storagePath });
+      await supabase.storage.from('wedding-images').remove([storagePath]);
+      return NextResponse.json({ success: false, message: error?.message || 'Không thể lưu metadata ảnh.' }, { status: 500 });
+    }
+
+    logUpload(requestId, 'request:success', {
+      imageId: (data as AlbumImageRow).id,
+      storagePath,
+    });
+
+    return NextResponse.json({ success: true, image: mapAlbumImage(data as AlbumImageRow) }, { status: 201 });
+  } catch (error) {
+    logUploadError(requestId, 'request:unexpected-error', error);
+    return NextResponse.json({ success: false, message: error instanceof Error ? error.message : 'Lỗi upload ảnh không xác định.' }, { status: 500 });
   }
-
-  const formData = await request.formData();
-  const file = formData.get('file');
-  const parsed = metadataSchema.safeParse({
-    siteId: formData.get('siteId') || process.env.NEXT_PUBLIC_SITE_ID,
-    title: formData.get('title') || undefined,
-    description: formData.get('description') || undefined,
-  });
-
-  if (!parsed.success) {
-    return NextResponse.json({ success: false, message: parsed.error.issues[0]?.message || 'Metadata không hợp lệ.' }, { status: 400 });
-  }
-
-  if (!(file instanceof File)) {
-    return NextResponse.json({ success: false, message: 'Thiếu file ảnh.' }, { status: 400 });
-  }
-
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json({ success: false, message: 'Chỉ hỗ trợ JPEG, PNG hoặc WebP.' }, { status: 400 });
-  }
-
-  if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json({ success: false, message: 'File ảnh tối đa 5MB.' }, { status: 400 });
-  }
-
-  const bucketError = await ensureStorageBucket(supabase);
-
-  if (bucketError) {
-    return NextResponse.json({ success: false, message: `Không thể chuẩn bị bucket wedding-images: ${bucketError}` }, { status: 500 });
-  }
-
-  const siteError = await ensureWeddingSite(supabase, parsed.data.siteId);
-
-  if (siteError) {
-    return NextResponse.json({ success: false, message: `Không thể chuẩn bị wedding site: ${siteError}` }, { status: 500 });
-  }
-
-  const safeFileName = getSafeFileName(file.name) || 'album-image';
-  const storagePath = `${parsed.data.siteId}/album/${Date.now()}-${safeFileName}`;
-  const { error: uploadError } = await supabase.storage.from('wedding-images').upload(storagePath, file, {
-    contentType: file.type,
-    upsert: false,
-  });
-
-  if (uploadError) {
-    return NextResponse.json({ success: false, message: uploadError.message }, { status: 500 });
-  }
-
-  const { data: publicUrlData } = supabase.storage.from('wedding-images').getPublicUrl(storagePath);
-  const { data, error } = await supabase
-    .from('album_images')
-    .insert({
-      site_id: parsed.data.siteId,
-      title: parsed.data.title || null,
-      description: parsed.data.description || null,
-      image_url: publicUrlData.publicUrl,
-      storage_path: storagePath,
-      is_visible: true,
-    })
-    .select('*')
-    .single();
-
-  if (error || !data) {
-    await supabase.storage.from('wedding-images').remove([storagePath]);
-    return NextResponse.json({ success: false, message: error?.message || 'Không thể lưu metadata ảnh.' }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true, image: mapAlbumImage(data as AlbumImageRow) }, { status: 201 });
 }
