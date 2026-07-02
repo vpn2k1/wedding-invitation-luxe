@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { getFallbackSiteSettings } from '@/lib/supabase/mappers';
 import type { AlbumImage, WeddingSiteSettings } from '@/lib/supabase/types';
 
@@ -18,8 +18,15 @@ type SettingsResponse = {
   settings?: WeddingSiteSettings;
 };
 
+type MutationResponse = {
+  success: boolean;
+  message?: string;
+  warning?: string;
+};
+
 export function AdminDashboard() {
   const router = useRouter();
+  const uploadFormRef = useRef<HTMLFormElement | null>(null);
   const [settings, setSettings] = useState<WeddingSiteSettings>(getFallbackSiteSettings());
   const [activePanel, setActivePanel] = useState<'content' | 'events' | 'layout' | 'album'>('content');
   const [title, setTitle] = useState('');
@@ -29,6 +36,7 @@ export function AdminDashboard() {
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUpdatingAlbum, setIsUpdatingAlbum] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
 
@@ -112,12 +120,76 @@ export function AdminDashboard() {
       setTitle('');
       setDescription('');
       setFile(null);
-      event.currentTarget.reset();
+      uploadFormRef.current?.reset();
       setNotice('Ảnh đã được upload và lưu vào album.');
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : 'Không thể upload ảnh lúc này.');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const persistImageOrder = async (nextImages: AlbumImage[]) => {
+    setIsUpdatingAlbum(true);
+    setNotice('');
+    setError('');
+
+    try {
+      const response = await fetch('/api/admin/album/reorder', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageIds: nextImages.map((image) => image.id) }),
+      });
+      const data = (await response.json()) as MutationResponse;
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Không thể lưu thứ tự ảnh.');
+      }
+
+      setImages(nextImages.map((image, index) => ({ ...image, sortOrder: index + 1 })));
+      setNotice('Đã cập nhật thứ tự album.');
+    } catch (orderError) {
+      setError(orderError instanceof Error ? orderError.message : 'Không thể lưu thứ tự ảnh.');
+      await loadImages();
+    } finally {
+      setIsUpdatingAlbum(false);
+    }
+  };
+
+  const moveImage = async (index: number, direction: -1 | 1) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= images.length || isUpdatingAlbum) return;
+
+    const nextImages = [...images];
+    const [movedImage] = nextImages.splice(index, 1);
+    nextImages.splice(targetIndex, 0, movedImage);
+    setImages(nextImages);
+    await persistImageOrder(nextImages);
+  };
+
+  const deleteImage = async (image: AlbumImage) => {
+    if (isUpdatingAlbum) return;
+    const shouldDelete = window.confirm(`Xóa ảnh "${image.title || 'Chưa có tiêu đề'}" khỏi album?`);
+    if (!shouldDelete) return;
+
+    setIsUpdatingAlbum(true);
+    setNotice('');
+    setError('');
+
+    try {
+      const response = await fetch(`/api/admin/album/${image.id}`, { method: 'DELETE' });
+      const data = (await response.json()) as MutationResponse;
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Không thể xóa ảnh.');
+      }
+
+      setImages((current) => current.filter((item) => item.id !== image.id));
+      setNotice(data.warning ? `Đã xóa ảnh khỏi database. Cảnh báo Storage: ${data.warning}` : 'Đã xóa ảnh khỏi album.');
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Không thể xóa ảnh.');
+    } finally {
+      setIsUpdatingAlbum(false);
     }
   };
 
@@ -303,7 +375,7 @@ export function AdminDashboard() {
 
             {activePanel === 'album' && (
               <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
-                <form onSubmit={handleUpload} className="space-y-4 rounded-2xl border border-champagne bg-ivory/70 p-4">
+                <form ref={uploadFormRef} onSubmit={handleUpload} className="space-y-4 rounded-2xl border border-champagne bg-ivory/70 p-4">
                   <TextField label="Tiêu đề ảnh" value={title} onChange={setTitle} />
                   <TextArea label="Mô tả ảnh" value={description} onChange={setDescription} />
                   <div>
@@ -338,7 +410,7 @@ export function AdminDashboard() {
                       <div key={index} className="aspect-square animate-pulse rounded-2xl bg-champagne/70" />
                     ))}
 
-                    {!isLoadingImages && images.map((image) => (
+                    {!isLoadingImages && images.map((image, index) => (
                       <article key={image.id} className="overflow-hidden rounded-2xl border border-champagne bg-ivory/70">
                         <div className="relative aspect-square bg-champagne">
                           <Image src={image.imageUrl} alt={image.title || 'Ảnh album cưới'} fill className="object-cover" />
@@ -346,6 +418,32 @@ export function AdminDashboard() {
                         <div className="p-4">
                           <h3 className="line-clamp-1 font-semibold text-plum">{image.title || 'Chưa có tiêu đề'}</h3>
                           <p className="mt-1 line-clamp-2 text-sm leading-6 text-ink/60">{image.description || 'Chưa có mô tả.'}</p>
+                          <div className="mt-4 grid grid-cols-3 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => moveImage(index, -1)}
+                              disabled={index === 0 || isUpdatingAlbum}
+                              className="rounded-full border border-wine/20 px-3 py-2 text-xs font-bold text-plum transition hover:bg-wine hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Lên
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveImage(index, 1)}
+                              disabled={index === images.length - 1 || isUpdatingAlbum}
+                              className="rounded-full border border-wine/20 px-3 py-2 text-xs font-bold text-plum transition hover:bg-wine hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Xuống
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteImage(image)}
+                              disabled={isUpdatingAlbum}
+                              className="rounded-full bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              Xóa
+                            </button>
+                          </div>
                         </div>
                       </article>
                     ))}
