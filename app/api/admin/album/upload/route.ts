@@ -34,13 +34,23 @@ function getSafeFileName(fileName: string) {
     .replace(/^-|-$/g, '');
 }
 
+function getSupabaseSetupMessage(message: string) {
+  const lowerMessage = message.toLowerCase();
+
+  if (lowerMessage.includes('schema cache') || lowerMessage.includes('could not find the table') || lowerMessage.includes('relation') && lowerMessage.includes('does not exist')) {
+    return `${message}. Supabase chưa có đủ database schema. Hãy mở Supabase SQL Editor và chạy file supabase/schema.sql, sau đó chạy supabase/seed.sql.`;
+  }
+
+  return message;
+}
+
 type SupabaseAdminClient = NonNullable<ReturnType<typeof createSupabaseAdminClient>>;
 
 async function ensureStorageBucket(supabase: SupabaseAdminClient) {
   const { data: buckets, error: listError } = await supabase.storage.listBuckets();
 
   if (listError) {
-    return listError.message;
+    return getSupabaseSetupMessage(listError.message);
   }
 
   const exists = buckets?.some((bucket) => bucket.name === 'wedding-images');
@@ -54,7 +64,7 @@ async function ensureStorageBucket(supabase: SupabaseAdminClient) {
   });
 
   if (error && !error.message.toLowerCase().includes('already exists')) {
-    return error.message;
+    return getSupabaseSetupMessage(error.message);
   }
 
   return null;
@@ -76,7 +86,7 @@ async function ensureWeddingSite(supabase: SupabaseAdminClient, siteId: string) 
       { onConflict: 'id' }
     );
 
-  return error?.message || null;
+  return error?.message ? getSupabaseSetupMessage(error.message) : null;
 }
 
 export async function POST(request: NextRequest) {
@@ -158,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       logUploadError(requestId, 'storage:upload:failed', uploadError, { storagePath });
-      return NextResponse.json({ success: false, message: uploadError.message }, { status: 500 });
+      return NextResponse.json({ success: false, message: getSupabaseSetupMessage(uploadError.message) }, { status: 500 });
     }
 
     const { data: publicUrlData } = supabase.storage.from('wedding-images').getPublicUrl(storagePath);
@@ -183,7 +193,7 @@ export async function POST(request: NextRequest) {
     if (error || !data) {
       logUploadError(requestId, 'database:insert:failed', error || 'missing inserted row', { storagePath });
       await supabase.storage.from('wedding-images').remove([storagePath]);
-      return NextResponse.json({ success: false, message: error?.message || 'Không thể lưu metadata ảnh.' }, { status: 500 });
+      return NextResponse.json({ success: false, message: error?.message ? getSupabaseSetupMessage(error.message) : 'Không thể lưu metadata ảnh.' }, { status: 500 });
     }
 
     logUpload(requestId, 'request:success', {
