@@ -1,9 +1,9 @@
 insert into public.wedding_sites (id, slug, bride_name, groom_name, wedding_date, is_active)
 values (
   '11111111-1111-4111-8111-111111111111',
-  'ha-nhi-phuong-nam',
-  'Hà Nhi',
-  'Phương Nam',
+  'co-dau-chu-re',
+  'Cô dâu',
+  'Chú rể',
   '2026-12-20T18:00:00+07:00',
   true
 )
@@ -27,10 +27,10 @@ values (
   '11111111-1111-4111-8111-111111111111',
   '{
     "siteId": "11111111-1111-4111-8111-111111111111",
-    "slug": "ha-nhi-phuong-nam",
-    "brideName": "Hà Nhi",
-    "groomName": "Phương Nam",
-    "fullTitle": "Hà Nhi & Phương Nam",
+    "slug": "co-dau-chu-re",
+    "brideName": "Cô dâu",
+    "groomName": "Chú rể",
+    "fullTitle": "Cô dâu & Chú rể",
     "weddingDate": "2026-12-20T18:00:00+07:00",
     "displayDate": "Chủ nhật, 20.12.2026",
     "quote": "Một đời thương nhớ, một ngày nên duyên, một lời hẹn cùng nhau đi đến cuối con đường.",

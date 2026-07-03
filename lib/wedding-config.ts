@@ -32,12 +32,12 @@ export type WeddingConfig = {
 };
 
 export const weddingConfig: WeddingConfig = {
-  groomName: 'Phương Nam',
-  brideName: 'Hà Nhi',
-  groomFullName: 'Vũ Phương Nam',
-  brideFullName: 'Hoàng Hà Nhi',
-  fullTitle: 'Hà Nhi & Phương Nam',
-  monogram: 'N&N',
+  groomName: 'Chú rể',
+  brideName: 'Cô dâu',
+  groomFullName: 'Chú rể',
+  brideFullName: 'Cô dâu',
+  fullTitle: 'Cô dâu & Chú rể',
+  monogram: 'C&C',
   weddingDate: '2026-12-20T18:00:00+07:00',
   displayDate: 'Chủ nhật, 20.12.2026',
   shortDate: '20 • 12 • 2026',
