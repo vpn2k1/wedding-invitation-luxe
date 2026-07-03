@@ -46,7 +46,7 @@ export const weddingConfig: WeddingConfig = {
   heroImage: '/images/luxe-hero.svg',
   brideImage: '/images/bride.svg',
   groomImage: '/images/groom.svg',
-  musicUrl: '/music/wedding-demo.wav',
+  musicUrl: '/music/wedding-demo.mp3',
   ceremonyDate: '20.12.2026',
   ceremonyTime: '09:00',
   ceremonyLocationName: 'Tư gia nhà gái',
