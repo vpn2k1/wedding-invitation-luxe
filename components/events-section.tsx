@@ -10,8 +10,7 @@ export function EventsSection() {
 
   return (
     <section id="events" className="relative overflow-hidden bg-porcelain px-5 py-24">
-      <div className="absolute -left-24 top-28 h-80 w-80 rounded-full bg-champagne/20 blur-3xl" />
-      <div className="absolute -right-24 bottom-12 h-96 w-96 rounded-full bg-wine/10 blur-3xl" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-dune/40 to-transparent" />
 
       <div className="relative mx-auto max-w-7xl">
         <SectionHeading

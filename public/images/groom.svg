@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1100" viewBox="0 0 900 1100">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf8"/><stop offset="1" stop-color="#ead1a2"/></linearGradient></defs>
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffccd5"/></linearGradient></defs>
     <rect width="900" height="1100" fill="url(#g)"/>
-    <circle cx="720" cy="180" r="170" fill="#5f6f5f" opacity=".18"/><circle cx="120" cy="930" r="220" fill="#6d2f3f" opacity=".08"/>
+    <circle cx="720" cy="180" r="170" fill="#e76a7f" opacity=".18"/><circle cx="120" cy="930" r="220" fill="#b10f2e" opacity=".08"/>
     <g transform="translate(175 185)">
       <ellipse cx="280" cy="310" rx="225" ry="300" fill="#fff" opacity=".42"/>
-      <path d="M170 626 C150 494 178 408 244 355 C290 318 356 308 414 332 C488 363 529 430 526 523 C522 614 455 688 346 708 C270 722 211 692 170 626Z" fill="#fffdf8"/>
-      <path d="M242 335 C198 311 143 329 122 379 C98 436 127 494 189 520 C196 434 232 384 299 360 C287 348 270 340 242 335Z" fill="#3f2230" opacity=".82"/>
-      <path d="M365 310 C420 282 497 303 528 372 C548 416 543 467 524 520 C482 444 420 397 323 397 C304 397 284 399 263 405 C277 357 311 330 365 310Z" fill="#3f2230" opacity=".84"/>
-      <circle cx="286" cy="438" r="60" fill="#d3a092"/><circle cx="410" cy="438" r="60" fill="#c89586"/>
+      <path d="M170 626 C150 494 178 408 244 355 C290 318 356 308 414 332 C488 363 529 430 526 523 C522 614 455 688 346 708 C270 722 211 692 170 626Z" fill="#ffffff"/>
+      <path d="M242 335 C198 311 143 329 122 379 C98 436 127 494 189 520 C196 434 232 384 299 360 C287 348 270 340 242 335Z" fill="#111111" opacity=".82"/>
+      <path d="M365 310 C420 282 497 303 528 372 C548 416 543 467 524 520 C482 444 420 397 323 397 C304 397 284 399 263 405 C277 357 311 330 365 310Z" fill="#111111" opacity=".84"/>
+      <circle cx="286" cy="438" r="60" fill="#ff9db0"/><circle cx="410" cy="438" r="60" fill="#e76a7f"/>
       <path d="M200 700 C265 560 346 532 418 568 C498 607 545 710 575 900 L82 900 C110 808 150 746 200 700Z" fill="#fff"/>
-      <path d="M230 727 C310 780 430 774 538 706" fill="none" stroke="#5f6f5f" stroke-width="7" opacity=".4"/>
+      <path d="M230 727 C310 780 430 774 538 706" fill="none" stroke="#e76a7f" stroke-width="7" opacity=".4"/>
     </g>
-    <text x="450" y="930" text-anchor="middle" font-family="Georgia, serif" font-size="68" fill="#3f2230">Chú rể</text>
-    <text x="450" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" letter-spacing="8" fill="#9d6d5d">CHÚ RỂ</text>
+    <text x="450" y="930" text-anchor="middle" font-family="Georgia, serif" font-size="68" fill="#111111">Chú rể</text>
+    <text x="450" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" letter-spacing="8" fill="#d81b3a">CHÚ RỂ</text>
     </svg>

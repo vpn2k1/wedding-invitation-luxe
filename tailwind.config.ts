@@ -5,16 +5,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        porcelain: '#fffdf8',
-        ivory: '#fbf4e9',
-        cream: '#f4e7d2',
-        champagne: '#ead1a2',
-        dune: '#c2a077',
-        clay: '#9d6d5d',
-        wine: '#6d2f3f',
-        plum: '#3f2230',
-        moss: '#5f6f5f',
-        ink: '#2d2320'
+        porcelain: '#ffffff',
+        ivory: '#fffafb',
+        cream: '#fff1f4',
+        champagne: '#ffd1da',
+        dune: '#e76a7f',
+        clay: '#d41434',
+        wine: '#b30f2d',
+        plum: '#111111',
+        moss: '#f8a8b8',
+        ink: '#111111'
       },
       fontFamily: {
         display: ['Cormorant Garamond', 'Georgia', 'Times New Roman', 'serif'],
@@ -22,9 +22,9 @@ const config: Config = {
         sans: ['Inter', 'Avenir Next', 'Segoe UI', 'Arial', 'sans-serif']
       },
       boxShadow: {
-        glow: '0 30px 100px rgba(109, 47, 63, 0.18)',
-        card: '0 24px 80px rgba(45, 35, 32, 0.12)',
-        soft: '0 18px 50px rgba(109, 47, 63, 0.10)'
+        glow: '0 30px 100px rgba(177, 15, 46, 0.18)',
+        card: '0 24px 80px rgba(17, 17, 17, 0.12)',
+        soft: '0 18px 50px rgba(177, 15, 46, 0.10)'
       },
       animation: {
         float: 'float 7s ease-in-out infinite',

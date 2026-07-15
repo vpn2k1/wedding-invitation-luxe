@@ -1,31 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
     <defs>
       <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2c7b7"/><stop offset="1" stop-color="#fff7ed"/></linearGradient>
-      <radialGradient id="r" cx="50%" cy="35%" r="54%"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#6d2f3f" stop-opacity=".18"/></radialGradient>
+      <radialGradient id="r" cx="50%" cy="35%" r="54%"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#b10f2e" stop-opacity=".18"/></radialGradient>
     </defs>
     <rect width="1200" height="1500" fill="url(#g)"/><rect width="1200" height="1500" fill="url(#r)"/>
-    <circle cx="1000" cy="260" r="210" fill="#6d2f3f" opacity=".10"/><circle cx="160" cy="1220" r="260" fill="#6d2f3f" opacity=".12"/>
+    <circle cx="1000" cy="260" r="210" fill="#b10f2e" opacity=".10"/><circle cx="160" cy="1220" r="260" fill="#b10f2e" opacity=".12"/>
     <g transform="translate(110 120)" opacity=".6">
-    <g id="floral" fill="none" stroke="#c2a077" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".72">
+    <g id="floral" fill="none" stroke="#d41434" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".72">
       <path d="M0 170 C55 130 70 80 88 10"/>
-      <path d="M34 132 C4 115 8 83 44 74 C77 67 96 92 79 117 C67 134 51 139 34 132Z" fill="#ead1a2" opacity=".25"/>
-      <path d="M64 90 C32 63 42 25 82 20 C119 17 139 49 118 76 C104 94 84 101 64 90Z" fill="#c88f8f" opacity=".18"/>
+      <path d="M34 132 C4 115 8 83 44 74 C77 67 96 92 79 117 C67 134 51 139 34 132Z" fill="#ffccd5" opacity=".25"/>
+      <path d="M64 90 C32 63 42 25 82 20 C119 17 139 49 118 76 C104 94 84 101 64 90Z" fill="#ff7f96" opacity=".18"/>
       <path d="M80 52 C112 39 132 26 152 0"/>
       <path d="M54 116 C87 118 111 130 134 160"/>
-      <circle cx="119" cy="50" r="4" fill="#c2a077" stroke="none" opacity=".8"/>
-      <circle cx="103" cy="118" r="3" fill="#c2a077" stroke="none" opacity=".8"/>
+      <circle cx="119" cy="50" r="4" fill="#d41434" stroke="none" opacity=".8"/>
+      <circle cx="103" cy="118" r="3" fill="#d41434" stroke="none" opacity=".8"/>
     </g>
     <use href="#floral" transform="translate(870 0) scale(-1 1)"/></g>
-    <rect x="105" y="140" width="990" height="1220" rx="68" fill="#fffdf8" opacity=".42" stroke="#fff" stroke-width="2"/>
+    <rect x="105" y="140" width="990" height="1220" rx="68" fill="#ffffff" opacity=".42" stroke="#fff" stroke-width="2"/>
     <g transform="translate(260 355)">
-      <path d="M190 670 C180 510 238 406 330 340 C395 294 472 274 550 300 C650 334 700 418 704 536 C708 650 630 746 482 778 C366 804 260 760 190 670Z" fill="#fffdf8" opacity=".92"/>
-      <path d="M325 324 C276 310 224 330 205 382 C184 437 215 500 280 524 C292 438 330 388 396 364 C383 344 360 331 325 324Z" fill="#6d2f3f" opacity=".76"/>
-      <path d="M486 280 C550 248 636 280 672 356 C692 400 690 458 668 522 C620 434 552 382 444 382 C418 382 392 386 366 396 C384 340 425 306 486 280Z" fill="#6d2f3f" opacity=".78"/>
-      <circle cx="374" cy="418" r="62" fill="#d3a092" opacity=".85"/>
-      <circle cx="512" cy="418" r="62" fill="#c98f8f" opacity=".85"/>
-      <path d="M258 720 C340 585 430 548 515 590 C605 634 656 720 704 950 L126 950 C160 850 198 772 258 720Z" fill="#fffdf8"/>
-      <path d="M302 736 C400 790 548 778 670 702" fill="none" stroke="#6d2f3f" stroke-width="7" opacity=".25"/>
+      <path d="M190 670 C180 510 238 406 330 340 C395 294 472 274 550 300 C650 334 700 418 704 536 C708 650 630 746 482 778 C366 804 260 760 190 670Z" fill="#ffffff" opacity=".92"/>
+      <path d="M325 324 C276 310 224 330 205 382 C184 437 215 500 280 524 C292 438 330 388 396 364 C383 344 360 331 325 324Z" fill="#b10f2e" opacity=".76"/>
+      <path d="M486 280 C550 248 636 280 672 356 C692 400 690 458 668 522 C620 434 552 382 444 382 C418 382 392 386 366 396 C384 340 425 306 486 280Z" fill="#b10f2e" opacity=".78"/>
+      <circle cx="374" cy="418" r="62" fill="#ff9db0" opacity=".85"/>
+      <circle cx="512" cy="418" r="62" fill="#ff7f96" opacity=".85"/>
+      <path d="M258 720 C340 585 430 548 515 590 C605 634 656 720 704 950 L126 950 C160 850 198 772 258 720Z" fill="#ffffff"/>
+      <path d="M302 736 C400 790 548 778 670 702" fill="none" stroke="#b10f2e" stroke-width="7" opacity=".25"/>
     </g>
-    <text x="600" y="1185" text-anchor="middle" font-family="Georgia, serif" font-size="76" fill="#6d2f3f">Chiều vàng</text>
-    <text x="600" y="1240" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" letter-spacing="8" fill="#6d2f3f" opacity=".7">CÔ DÂU &amp; CHÚ RỂ</text>
+    <text x="600" y="1185" text-anchor="middle" font-family="Georgia, serif" font-size="76" fill="#b10f2e">Chiều vàng</text>
+    <text x="600" y="1240" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" letter-spacing="8" fill="#b10f2e" opacity=".7">CÔ DÂU &amp; CHÚ RỂ</text>
     </svg>

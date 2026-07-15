@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { SectionHeading } from '@/components/section-heading';
 import { useSiteSettings } from '@/components/site-settings-provider';
+import { WeddingImage } from '@/components/wedding-image';
 
 export function CoupleSection() {
-  const { settings } = useSiteSettings();
+  const { settings, isLoading } = useSiteSettings();
   const people = [
     { role: 'Cô dâu', name: settings.brideName, fullName: settings.brideName, description: settings.brideDescription, image: settings.brideImage },
     { role: 'Chú rể', name: settings.groomName, fullName: settings.groomName, description: settings.groomDescription, image: settings.groomImage },
@@ -25,7 +25,7 @@ export function CoupleSection() {
             <article key={person.role} className="group relative overflow-hidden rounded-[2.6rem] border border-white/70 bg-white/62 p-4 shadow-card backdrop-blur">
               <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-cream">
-                  <Image src={person.image} alt={`Ảnh ${person.role}`} fill className="object-cover transition duration-700 group-hover:scale-105" />
+                  <WeddingImage src={isLoading ? null : person.image} alt={`Ảnh ${person.role}`} fill sizes="(min-width: 1024px) 280px, 100vw" className="object-cover transition duration-700 group-hover:scale-105" />
                 </div>
                 <div className="flex flex-col justify-center p-4 md:p-6">
                   <p className="text-[11px] font-bold uppercase tracking-[0.38em] text-dune">{person.role}</p>

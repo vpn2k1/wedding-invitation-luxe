@@ -4,8 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:web": "next dev",
+    "dev:admin": "npm --prefix ../wedding-admin-app run dev",
     "build": "next build",
+    "build:web": "next build",
+    "build:admin": "npm --prefix ../wedding-admin-app run build",
     "start": "next start",
+    "start:admin": "npm --prefix ../wedding-admin-app run start",
     "lint": "next lint"
   },
   "dependencies": {

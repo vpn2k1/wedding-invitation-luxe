@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useSiteSettings } from '@/components/site-settings-provider';
+import { WeddingImage } from '@/components/wedding-image';
 import { getFallbackAlbumImages } from '@/lib/supabase/mappers';
 import type { AlbumImage } from '@/lib/supabase/types';
 
@@ -16,12 +16,12 @@ function clampIndex(value: number, length: number) {
 export function AlbumStorybook() {
   const { settings } = useSiteSettings();
   const searchParams = useSearchParams();
-  const [images, setImages] = useState<AlbumImage[]>(getFallbackAlbumImages());
+  const [images, setImages] = useState<AlbumImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const initial = clampIndex(Number(searchParams.get('photo') || 1) - 1, images.length);
   const [activeIndex, setActiveIndex] = useState(initial);
   const activeImage = images[activeIndex];
-  const nextImage = images[(activeIndex + 1) % images.length];
+  const nextImage = images.length ? images[(activeIndex + 1) % images.length] : undefined;
 
   useEffect(() => {
     let isMounted = true;
@@ -29,9 +29,10 @@ export function AlbumStorybook() {
     fetch('/api/album')
       .then((response) => response.json())
       .then((data: { images?: AlbumImage[] }) => {
-        if (isMounted && data.images?.length) {
-          setImages(data.images);
-          setActiveIndex(clampIndex(Number(searchParams.get('photo') || 1) - 1, data.images.length));
+        if (isMounted) {
+          const nextImages = data.images?.length ? data.images : getFallbackAlbumImages();
+          setImages(nextImages);
+          setActiveIndex(clampIndex(Number(searchParams.get('photo') || 1) - 1, nextImages.length));
         }
       })
       .catch(() => {
@@ -58,7 +59,7 @@ export function AlbumStorybook() {
           <div>
             <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.45em] text-dune">Editorial Photo Book</p>
             <h1 className="font-display text-6xl leading-none text-plum md:text-8xl">Album cưới</h1>
-            <p className="mt-4 max-w-2xl leading-8 text-ink/62">Ảnh được ưu tiên lấy từ Supabase Storage, tự fallback khi chưa cấu hình.</p>
+            <p className="mt-4 max-w-2xl leading-8 text-ink/62">Những khoảnh khắc cưới được sắp như một cuốn photobook nhỏ.</p>
           </div>
           <Link href="/invitation#album" className="rounded-full border border-dune/30 bg-white/70 px-5 py-3 text-sm font-bold uppercase tracking-[0.2em] text-plum shadow-sm transition hover:bg-plum hover:text-white">
             Về trang thiệp
@@ -70,13 +71,17 @@ export function AlbumStorybook() {
             <article className="album-page-left relative overflow-hidden rounded-[2.2rem] bg-cream shadow-soft">
               <div className="relative aspect-[4/5] md:aspect-[4/5]">
                 {isLoading && <div className="absolute inset-0 animate-pulse bg-cream" />}
-                {!isLoading && activeImage && <Image src={activeImage.imageUrl} alt={activeImage.title || 'Ảnh album cưới'} fill priority className="object-cover" />}
-                <div className="absolute inset-0 bg-gradient-to-t from-plum/55 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-white sm:bottom-6 sm:left-6 sm:right-6">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-champagne">Page {pageLabel}</p>
-                  <h2 className="mt-2 line-clamp-2 font-display text-4xl leading-none sm:text-5xl">{activeImage?.title || 'Khoảnh khắc cưới'}</h2>
-                  <p className="mt-3 line-clamp-3 leading-7 text-white/78">{activeImage?.description || 'Một khoảnh khắc đáng nhớ trong album.'}</p>
-                </div>
+                {!isLoading && activeImage && <WeddingImage src={activeImage.imageUrl} alt={activeImage.title || 'Ảnh album cưới'} fill priority sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />}
+                {!isLoading && activeImage && (
+                  <>
+                    <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-ink/58 via-transparent to-transparent" />
+                    <div className="pointer-events-none absolute bottom-4 left-4 right-4 z-10 text-white sm:bottom-6 sm:left-6 sm:right-6">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-champagne">Page {pageLabel}</p>
+                      <h2 className="mt-2 line-clamp-2 font-display text-4xl leading-none sm:text-5xl">{activeImage.title || 'Khoảnh khắc cưới'}</h2>
+                      <p className="mt-3 line-clamp-3 leading-7 text-white/78">{activeImage.description || 'Một khoảnh khắc đáng nhớ trong album.'}</p>
+                    </div>
+                  </>
+                )}
               </div>
             </article>
 
@@ -88,7 +93,7 @@ export function AlbumStorybook() {
                   <p className="mt-5 leading-8 text-ink/62">{nextImage?.description || 'Một trang ảnh khác trong câu chuyện cưới.'}</p>
                 </div>
                 <div className="relative mt-6 aspect-[4/3] overflow-hidden rounded-[1.8rem] bg-cream">
-                  {nextImage && <Image src={nextImage.imageUrl} alt={nextImage.title || 'Ảnh album cưới'} fill className="object-cover" />}
+                  {nextImage && <WeddingImage src={nextImage.imageUrl} alt={nextImage.title || 'Ảnh album cưới'} fill sizes="320px" className="object-cover" />}
                 </div>
                 <div className="mt-6 flex items-center justify-between border-t border-dune/20 pt-5 text-sm text-ink/50">
                   <span>{settings.fullTitle}</span>
@@ -100,10 +105,10 @@ export function AlbumStorybook() {
 
           <aside className="rounded-[2.4rem] border border-white/70 bg-white/62 p-5 shadow-card backdrop-blur">
             <div className="flex gap-3">
-              <button type="button" onClick={goPrev} className="flex-1 rounded-full border border-dune/30 px-5 py-3 font-bold text-plum transition hover:bg-plum hover:text-white">
+              <button type="button" onClick={goPrev} disabled={isLoading || images.length < 2} className="flex-1 rounded-full border border-dune/30 px-5 py-3 font-bold text-plum transition hover:bg-plum hover:text-white disabled:cursor-wait disabled:opacity-50">
                 Trước
               </button>
-              <button type="button" onClick={goNext} className="flex-1 rounded-full bg-plum px-5 py-3 font-bold text-white transition hover:bg-wine">
+              <button type="button" onClick={goNext} disabled={isLoading || images.length < 2} className="flex-1 rounded-full bg-plum px-5 py-3 font-bold text-white transition hover:bg-wine disabled:cursor-wait disabled:opacity-50">
                 Sau
               </button>
             </div>
@@ -119,14 +124,17 @@ export function AlbumStorybook() {
                   }`}
                   aria-label={`Xem ảnh ${image.title}`}
                 >
-                  <Image src={image.imageUrl} alt="" fill className="object-cover" />
+                  <WeddingImage src={isLoading ? null : image.imageUrl} alt="" fill sizes="96px" className="object-cover" />
                 </button>
+              ))}
+              {isLoading && Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="aspect-square animate-pulse rounded-2xl bg-cream" />
               ))}
             </div>
 
             <div className="mt-5 rounded-[1.6rem] bg-porcelain p-4 text-sm leading-7 text-ink/60">
               <p className="font-bold text-plum">Ghi chú mở rộng</p>
-              <p className="mt-2">Admin upload ảnh vào Supabase, album sẽ tự cập nhật từ endpoint <code>/api/album</code>.</p>
+              <p className="mt-2">Ảnh mới từ admin sẽ tự cập nhật sau khi tải lại album.</p>
             </div>
           </aside>
         </section>

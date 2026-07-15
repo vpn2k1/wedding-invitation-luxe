@@ -119,10 +119,10 @@ export const albumImages: AlbumImage[] = [
 ];
 
 export const dressCodes: DressCode[] = [
-  { label: 'Ivory', color: '#fbf4e9', note: 'Nhẹ nhàng' },
-  { label: 'Champagne', color: '#ead1a2', note: 'Ấm áp' },
-  { label: 'Dusty Rose', color: '#c88f8f', note: 'Lãng mạn' },
-  { label: 'Deep Wine', color: '#6d2f3f', note: 'Sang trọng' },
+  { label: 'Trắng', color: '#ffffff', note: 'Tinh khôi' },
+  { label: 'Hồng phấn', color: '#ffd1da', note: 'Nhẹ nhàng' },
+  { label: 'Hồng đậm', color: '#ff7f96', note: 'Lãng mạn' },
+  { label: 'Đỏ rượu', color: '#b10f2e', note: 'Nổi bật' },
 ];
 
 export const bankQrList = [

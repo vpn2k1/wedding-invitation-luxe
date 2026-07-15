@@ -92,7 +92,7 @@ export function CommentSection() {
 
   return (
     <section id="guestbook" className="relative overflow-hidden bg-porcelain px-5 py-24">
-      <div className="absolute left-0 top-0 h-80 w-80 rounded-full bg-wine/10 blur-3xl" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-moss/35 to-transparent" />
       <div className="relative mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.92fr_1.08fr]">
         <div>
           <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.42em] text-dune">Guestbook & RSVP</p>
@@ -156,7 +156,7 @@ export function CommentSection() {
             >
               {isSubmitting ? 'Đang gửi...' : 'Gửi lời chúc'}
             </button>
-            {notice && <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{notice}</p>}
+            {notice && <p className="rounded-2xl bg-champagne px-4 py-3 text-sm font-semibold text-ink">{notice}</p>}
             {error && <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
           </form>
         </div>
